@@ -27,7 +27,7 @@ def create_app():
     with app.app_context():
         db.create_all()
         if not app.security.datastore.find_user(username="admin"): 
-            app.security.datastore.create_user(name="admin", username="admin",Email="admin@123", password=generate_password_hash("admin"))
+            app.security.datastore.create_user(name="admin", username="admin",Email="admin@123", password=generate_password_hash("admin123"))
             app.security.datastore.create_role(name="admin")
             app.security.datastore.add_role_to_user(app.security.datastore.find_user(username="admin"),
                                                     app.security.datastore.find_role("admin"))

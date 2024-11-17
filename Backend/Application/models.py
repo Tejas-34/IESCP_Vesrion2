@@ -14,8 +14,9 @@ class User(db.Model, UserMixin):
     Email = db.Column(db.String(80), nullable=False)
     username = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
-    fs_uniquifier = db.Column(db.String(64), unique=True, nullable=False)
     active = db.Column(db.Boolean, default=True)
+    fs_uniquifier = db.Column(db.String(64), unique=True, nullable=False)
+    flag = db.Column(db.Boolean, default=False)
     bio = db.Column(db.String(150), nullable=True)
 
 
@@ -63,6 +64,7 @@ class Sponsor(db.Model):
     Budget = db.Column(db.Integer, nullable=False)
     Industry = db.Column(db.String(80), nullable=False)
     Approve = db.Column(db.Boolean, default=False)
+    pending = db.Column(db.Boolean, default=True)
 
     ad_requests = db.relationship('AdRequest', back_populates='sponsor', cascade='all, delete-orphan')
 

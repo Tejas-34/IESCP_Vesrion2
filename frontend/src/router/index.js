@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import store from '@/store'
 import LoginView from '@/views/LoginView.vue'
 import index from '@/views/index.vue'
-import AdminDashboard from '@/views/Admin/adminDashboard.vue'
 import Registration from '@/views/Signin/Registration.vue'
 import registractionSucces from '@/views/Signin/registractionSucces.vue'
 import InfluDashboard from '@/views/Influencer/influDashboard.vue'
@@ -24,6 +23,9 @@ import SpoRequest from '@/views/Sponsor/AdRequest/SpoRequest.vue'
 import Negotiation from '@/views/Negotiation.vue'
 import SpoCampReq from '@/views/Sponsor/SpoCampReq.vue'
 import InfAllRequest from '@/views/Influencer/InfAllRequest.vue'
+import AdHome from '@/views/Admin/adHome.vue'
+import AdminDashboard from '@/views/Admin/adminDashboard.vue'
+import User from '@/views/Admin/user.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -67,13 +69,18 @@ const router = createRouter({
 
     {
       path: '/admin',
-      name: 'admin',
+      name: 'admin-nav',
       component: AdminDashboard,
       children: [
         {
           path: '',
           name: 'AdminHome',
-          component: '',
+          component: AdHome,
+        },
+        {
+          path: 'user',
+          name: 'user',
+          component: User,
         }
       ]
     },
@@ -187,14 +194,14 @@ const router = createRouter({
 
 
 
-router.beforeEach((to, from) => {                        //check every time when route execute
-  if (to.fullPath.match(/[/]admin*/)) {                   //ensure that only admin should acces their dashboard
-    if (store.getters.getRoles.includes("admin")) {
-      return true
-    }
-    else {
-      router.push('/login');
-    }
-  }
-})
+// router.beforeEach((to, from) => {                        //check every time when route execute
+//   if (to.fullPath.match(/[/]admin*/)) {                   //ensure that only admin should acces their dashboard
+//     if (store.getters.getRoles.includes("admin")) {
+//       return true
+//     }
+//     else {
+//       router.push('/login');
+//     }
+//   }
+// })
 export default router

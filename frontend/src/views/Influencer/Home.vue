@@ -8,7 +8,7 @@
         <div class="row mb-4">
             <!-- Total Earnings Box -->
             <div class="col-md-6">
-                <div class="card shadow p-3 mb-5 bg-body rounded earnings-box">
+                <div class="card stats-card shadow p-3 mb-5 bg-body rounded earnings-box">
                     <div class="card-body text-center"> 
                         <h5>Total Earnings</h5>
                         <p class="display-6 text-success">${{ earning }}</p>
@@ -18,10 +18,10 @@
 
             <!-- Total Pending Requests Box -->
             <div class="col-md-6">
-                <div class="card shadow p-3 mb-5 bg-body rounded pending-box">
+                <div class="card stats-card shadow p-3 mb-5 bg-body rounded pending-box">
                     <div class="card-body text-center">
                         <h5>Total Pending Requests</h5>
-                        <p class="display-6 text-warning">0</p>
+                        <p class="display-6 text-warning">{{ pending }}</p>
                     </div>
                 </div>
             </div>
@@ -202,5 +202,20 @@ export default {
         font-size: 0.85rem;
         color: #6c757d;
     }
+
+    .stats-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+
+
+.stats-card:hover {
+    transform: scale(1.05);
+}
+
+
+
     </style>
 

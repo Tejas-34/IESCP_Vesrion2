@@ -248,6 +248,11 @@ p {
     margin-bottom: 3px;
 }
 
+.modal-dialog {
+    margin: 10% auto;
+    width: 50%;
+}
+
 
 .modal {
     background-color: rgba(0, 0, 0, 0.4);

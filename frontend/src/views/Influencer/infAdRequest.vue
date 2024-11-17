@@ -218,6 +218,11 @@ export default {
   color: white;
 }
 
+.modal-dialog {
+    margin: 10% auto;
+    width: 50%;
+}
+
 .modal-header .btn-close {
   color: white;
 }
