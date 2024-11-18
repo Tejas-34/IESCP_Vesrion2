@@ -29,10 +29,13 @@ def signin():
     if user.get_roles()[0] == 'sponsor':
         return {"token": access_token,
             "roles": user.get_roles(),
-            "approve": user.sponsor_profile.Approve,'user_id':user.id, 'flag':user.flag}
+            "approve": user.sponsor_profile.Approve,
+            'user_id':user.id, 
+            'flag':user.flag,
+            'pending':user.sponsor_profile.pending}
     else:
         return {"token": access_token,
-                "roles": user.get_roles(), 'user_id':user.id, 'flag':user.flag}
+                "roles": user.get_roles(), 'user_id':user.id, 'lafg':user.flag}
     
     
 
@@ -828,13 +831,13 @@ def admin_home():
 
     pending_approve =  Sponsor.query.filter_by(pending=True).count()
     active_camp = Campaign.query.filter_by(flagged=False).count()
-
     flag_user = User.query.filter_by(flag=True).count()
     flag_camp = Campaign.query.filter_by(flagged=True).count()
 
     flag = flag_camp + flag_user
 
-    sponsor_pending = Sponsor.query.all()
+
+    sponsors = Sponsor.query.all()
     
    #get data of sponsor which not have approve
     sponsor_data = [
@@ -842,20 +845,26 @@ def admin_home():
             'name': User.query.filter_by(id=sponsor.user_id).first().name,
             'email': User.query.filter_by(id=sponsor.user_id).first().Email,
             'username': User.query.filter_by(id=sponsor.user_id).first().username,
+            'flag': User.query.filter_by(id=sponsor.user_id).first().flag,
+            'id': User.query.filter_by(id=sponsor.user_id).first().id,
             'company_name': sponsor.company_name,
             'budget': sponsor.Budget,
             'industry': sponsor.Industry,
             'approve': sponsor.Approve,
             'pending': sponsor.pending,
-            'id': sponsor.id
+            'spo_id': sponsor.id,
         }
-        for sponsor in sponsor_pending
+        for sponsor in sponsors
     ]
 
-
-
-
-    return jsonify({'data': sponsor_data, 'flag':flag,'pendingApprove':pending_approve, 'activeCamp':active_camp,'activUser':active_user}),200
+    return jsonify({'data': sponsor_data,
+                     'flag':flag,
+                     'pendingApprove':pending_approve, 
+                     'activeCamp':active_camp,
+                     'activUser':active_user,
+                     'flaggedUsers': flag_user,
+                     'sponsor':sponsor_data,
+                     }),200
 
 
 #route to approve sponsor
@@ -881,23 +890,117 @@ def approve_sponsor(id,action):
 
 
 
+#route for give admin not approve sponsor and some data
 @api.route('/admin/stats', methods=['GET'])
 @jwt_required()
-def get_admin_stats():
-    total_users = User.query.count()
-    active_users = User.query.filter_by(active=True).count()
-    flagged_users = User.query.filter_by(flag=True).count()
-    new_signups = User.query.filter(User.created_at > datetime.utcnow() - timedelta(days=30)).count()
+def get_stats():
+    curr_user = get_jwt_identity()
+    user_id = curr_user.get('id')
     
-    ad_request_stats = {
-        "pending": AdRequest.query.filter_by(status="Pending").count(),
-        "approved": AdRequest.query.filter_by(status="Approved").count(),
-        "rejected": AdRequest.query.filter_by(status="Rejected").count(),
-    }
-    return jsonify({
-        "total_users": total_users,
-        "active_users": active_users,
-        "flagged_users": flagged_users,
-        "new_signups": new_signups,
-        "ad_request_stats": ad_request_stats,
-    })
+    if "admin" not in curr_user.get('role'):
+        return jsonify({"msg": "Admin access required"}), 403
+    
+    active_user = User.query.filter_by(flag=False).count()-1
+
+    active_user -= Sponsor.query.filter_by(Approve=False).count()
+
+    active_camp = Campaign.query.filter_by(flagged=False).count()
+    flag_user = User.query.filter_by(flag=True).count()
+    flag_camp = Campaign.query.filter_by(flagged=True).count()
+
+    flag = flag_camp + flag_user
+
+    sponsorsCount = Sponsor.query.filter_by(Approve=True).count()
+    influencersCount = Influencer.query.count()
+
+
+    sponsors = Sponsor.query.filter_by(Approve=True).all()
+    
+   #get data of sponsor which not have approve
+    sponsor_data = [
+        {
+            'name': User.query.filter_by(id=sponsor.user_id).first().name,
+            'email': User.query.filter_by(id=sponsor.user_id).first().Email,
+            'username': User.query.filter_by(id=sponsor.user_id).first().username,
+            'flag': User.query.filter_by(id=sponsor.user_id).first().flag,
+            'totalCamp': Campaign.query.filter_by(sponsor_id=sponsor.id).count(),
+            'company_name': sponsor.company_name,
+            'budget': sponsor.Budget,
+            'industry': sponsor.Industry,
+            'approve': sponsor.Approve,
+            'pending': sponsor.pending,
+            'spo_id': sponsor.id,
+            'id': User.query.filter_by(id=sponsor.user_id).first().id
+        }
+        for sponsor in sponsors
+    ]
+
+    influencer = Influencer.query.all()
+
+    influencer_data = [
+        {
+            'name': User.query.filter_by(id=inf.user_id).first().name,
+            'email': User.query.filter_by(id=inf.user_id).first().Email,
+            'username': User.query.filter_by(id=inf.user_id).first().username,
+            'flag': User.query.filter_by(id=inf.user_id).first().flag,
+            'earning': inf.earning,
+            'niche': inf.Niche,
+            'reach': inf.Reach,
+            'category': inf.Category,
+            'id': User.query.filter_by(id=inf.user_id).first().id
+        }
+        for inf in influencer
+    ]
+
+
+
+
+    return jsonify({'data': sponsor_data,
+                     'flag':flag,
+                     'activeCamp':active_camp,
+                     'activUser':active_user,
+                     'flaggedUsers': flag_user,
+                     'sponsorsCount':sponsorsCount,
+                     'influencersCount':influencersCount,
+                     'sponsor':sponsor_data,
+                     'influencers':influencer_data,
+                     }),200
+
+
+
+
+
+#flag users
+@api.route('/admin/flag/<int:id>', methods=['PUT'])
+@jwt_required()
+def flag_user(id):
+    curr_user = get_jwt_identity()
+    if "admin" not in curr_user.get('role'):
+        return jsonify({"msg": "Admin access required"}), 403
+    
+    user = User.query.filter_by(id=id).first()
+    if user.flag:
+        user.flag = False
+    else:
+        user.flag = True
+    db.session.commit()
+
+    return jsonify({"msg": "successful"}), 200
+
+
+#route to delte user
+@api.route('/admin/delete/<int:id>',methods=['DELETE'])
+@jwt_required()
+def delete_user(id):
+    curr_user  = get_jwt_identity()
+    if "admin" not in curr_user.get("role"):
+        return jsonify({"msg": "Admin access required"}), 403
+    
+    user = User.query.filter_by(id = id).first()
+    if not user:
+        return {"message": "User not found"}, 404
+    
+    db.session.delete(user)
+    db.session.commit()
+
+    return {"message": "Deleted successfully"}, 200

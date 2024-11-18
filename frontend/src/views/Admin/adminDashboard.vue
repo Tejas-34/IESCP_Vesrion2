@@ -10,10 +10,8 @@ import { RouterLink, RouterView } from 'vue-router'
             <aside class="col-md-3 col-lg-2 sidebar">
                 <h2 class="text-white">Admin</h2>
                 <router-link to="/admin">Home</router-link>
-                <router-link to="/admin">Statistics</router-link>
                 <router-link to="/admin/user">User Management</router-link>
                 <router-link to="/admin">Campaigns</router-link>
-                <router-link to="/admin">Flagged Content</router-link>
                 <a href="/login">Logout</a>
                 
             </aside>

@@ -14,7 +14,7 @@ import { RouterView } from 'vue-router';
             <router-link to="/Sponsor/Camp">My Campaigns</router-link>
             <router-link to="/Sponsor/CreatCamp">Create Campaign</router-link>
             <router-link to="/Sponsor/CampReq">Received Request</router-link>
-            <router-link to="/Sponsor/CampReqTotal">Campaign Request</router-link>
+            <router-link to="/Sponsor/CampReqTotal">Track Request</router-link>
             <router-link to="/login">Logout</router-link>
         </div>
 

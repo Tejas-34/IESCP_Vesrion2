@@ -29,7 +29,7 @@
                 <div class="card stats-card shadow">
                     <div class="card-body">
                         <h5 class="card-title text-warning">Pending Requests</h5>
-                        <p><strong class="text-success h4 fw-bolder" >{{sponsor.active_camp}}</strong></p>
+                        <p><strong class="text-success h4 fw-bolder" >{{sponsor.pending_req}}</strong></p>
                     </div>
                 </div>
             </div>
