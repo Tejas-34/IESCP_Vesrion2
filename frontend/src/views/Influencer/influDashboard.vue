@@ -14,7 +14,7 @@ import { RouterLink, RouterView } from 'vue-router'
                 <router-link to="/influencer/AdRequest">Ad Request</router-link>
                 <router-link to="/influencer/s_camp">Search Campaign</router-link>
                 <router-link to="/AllRequest">Track Request</router-link>
-                <a href="/login">Logout</a>
+                <button class="logout-btn" @click="logout">Logout</button>
                 
             </div>
 
@@ -26,6 +26,8 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <script>
 
+import router from "@/router";
+
 export default {
     data() {
         return {
@@ -34,6 +36,13 @@ export default {
             log: false
         }
     },
+    methods:{
+        logout(){
+            localStorage.removeItem('token');
+            localStorage.removeItem("user");
+            router.push('/login');
+        }
+    }
 }
 
 </script>
@@ -60,6 +69,19 @@ export default {
     display: block;
     font-weight: 500;
     margin-bottom: 10px;
+}
+
+.sidebar button.logout-btn {
+    background-color: transparent;
+    border: none;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+}
+
+.sidebar button.logout-btn:hover {
+    background-color: #495057;
+    border-radius: 5px;
 }
 
 .sidebar a:hover {

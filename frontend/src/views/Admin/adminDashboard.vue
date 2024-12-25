@@ -11,8 +11,7 @@ import { RouterLink, RouterView } from 'vue-router'
                 <h2 class="text-white">Admin</h2>
                 <router-link to="/admin">Home</router-link>
                 <router-link to="/admin/user">User Management</router-link>
-                <router-link to="/admin">Campaigns</router-link>
-                <a href="/login">Logout</a>
+                <button class="logout-btn" @click="logout">Logout </button>
                 
             </aside>
 
@@ -23,19 +22,27 @@ import { RouterLink, RouterView } from 'vue-router'
     </div>
 </template>
 
+
 <script>
 
+import router from "@/router";
+
 export default {
-    data() {
-        return {
-            username: null,
-            password: null,
-            log: false
+
+    methods:{
+        logout(){
+            localStorage.removeItem('token');
+            localStorage.removeItem("user");
+            router.push('/login');
         }
-    },
+    }
+
 }
 
 </script>
+
+
+
 
 
 <style scoped>
@@ -61,11 +68,38 @@ export default {
     margin-bottom: 10px;
 }
 
+.sidebar button.logout-btn {
+    background-color: transparent;
+    border: none;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: left;
+    cursor: pointer;
+}
+
+
+.sidebar p {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
 .sidebar a:hover {
     background-color: #495057;
     border-radius: 5px;
 }
 
+.sidebar button.logout-btn:hover {
+    background-color: #495057;
+    border-radius: 5px;
+}
 
 .content {
     margin-left: 350px;

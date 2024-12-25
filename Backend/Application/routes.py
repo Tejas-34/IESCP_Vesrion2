@@ -1,4 +1,4 @@
-from flask import Blueprint, request,jsonify
+from flask import Blueprint, request,jsonify, send_file
 from flask import current_app as app
 from flask_login import login_required
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -6,8 +6,12 @@ import json
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_security import current_user, login_user, roles_required,login_required
 from werkzeug.security import generate_password_hash, check_password_hash
-from Application.models import db, Influencer, Sponsor, User, Role, Campaign, AdRequest
+from .models import db, Influencer, Sponsor, User, Role, Campaign, AdRequest
 from datetime import datetime
+from .worker import import_csv
+from celery.result import AsyncResult
+from io import BytesIO
+from .cache import cache
 
 datastore = SQLAlchemyUserDatastore(db, User, Role)
 
@@ -35,7 +39,7 @@ def signin():
             'pending':user.sponsor_profile.pending}
     else:
         return {"token": access_token,
-                "roles": user.get_roles(), 'user_id':user.id, 'lafg':user.flag}
+                "roles": user.get_roles(), 'user_id':user.id, 'flag':user.flag}
     
     
 
@@ -254,7 +258,9 @@ def create_campaign():
 
 @api.route('/sponsor/campaigns', methods=['GET'])
 @jwt_required()
+@cache.cached(15)
 def get_campaigns():
+    print('im in')
     curr_user = get_jwt_identity()
     if "sponsor" not in curr_user.get("role"):
         return jsonify({"msg": "Sponsor access required"}), 403
@@ -262,7 +268,7 @@ def get_campaigns():
     user_id = curr_user.get('id')
     user = User.query.filter_by(id=user_id).first()
     campaigns = Campaign.query.filter_by(sponsor_id=user.sponsor_profile.id).all()
-    return jsonify([{'id':camp.id,"name": camp.name, "description": camp.description, "start_date": camp.start_date.strftime("%a, %d %b %Y"), "end_date": camp.end_date.strftime("%a, %d %b %Y"), "budget": camp.budget, "goals": camp.goals, "category": camp.category, "visibility": camp.visibility} for camp in campaigns]), 200
+    return jsonify([{'id':camp.id, "name": camp.name, "description": camp.description, "start_date": camp.start_date.strftime("%a, %d %b %Y"), "end_date": camp.end_date.strftime("%a, %d %b %Y"), "budget": camp.budget, "goals": camp.goals, "category": camp.category, "visibility": camp.visibility} for camp in campaigns], {"sponsor_id":user.sponsor_profile.id} ), 200
 
 
 @api.route('/sponsor/campaign/<int:camp_id>', methods=['GET'])
@@ -665,7 +671,14 @@ def search_campaigns():
     category = request.args.get('category', '').lower()
     min_budget = request.args.get('budget', type=int, default=0)
 
-    query = db.session.query(Campaign).join(Sponsor).filter( Campaign.visibility == 'public')
+    #fagged user campaing will not be shown
+    query = (
+    db.session.query(Campaign)
+    .join(Sponsor)
+    .join(User, Sponsor.user_id == User.id)  # Join the User table via Sponsor
+    .filter(Campaign.visibility == 'public', User.flag == False)  # Ensure sponsor's user is not flagged
+    )
+
 
     if name:
         query = query.filter(Campaign.name.ilike(f"%{name}%"))
@@ -1004,3 +1017,25 @@ def delete_user(id):
     db.session.commit()
 
     return {"message": "Deleted successfully"}, 200
+
+
+
+
+@api.route('/export/<int:id>')
+def export(id):
+    task = import_csv.delay(id)
+    return {"id": task.id}
+
+
+@api.route('/export/<string:tid>/status')
+def export_status(tid):
+    result = AsyncResult(tid)
+    return {"status": result.status}
+
+
+@api.route('/export/<string:tid>')
+def export_download(tid):
+    result = AsyncResult(tid)
+    file = BytesIO(result.result.encode())
+    return send_file(file,"text", as_attachment=True, download_name="export.csv")
+

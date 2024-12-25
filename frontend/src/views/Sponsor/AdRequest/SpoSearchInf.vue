@@ -164,7 +164,7 @@ export default {
                 .then(data => {
                     if (data) {
                         console.log(data);
-                        this.campaigns = data;
+                        this.campaigns = data[0];
                     }
                 })
                 .catch(error => console.error("Error fetching influencer data:", error));

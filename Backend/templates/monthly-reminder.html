@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Monthly Sponsor Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .email-container {
+            max-width: 700px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .email-header {
+            background: #004b8d;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .email-header p {
+            margin: 5px 0 0;
+            font-size: 1em;
+        }
+        .email-body {
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .card-header {
+            background: #f7f9fc;
+            color: #004b8d;
+            font-weight: bold;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .card-body p {
+            margin: 8px 0;
+            font-size: 1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        table th {
+            background: #f7f9fc;
+            color: #004b8d;
+            font-weight: bold;
+        }
+        table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .email-footer {
+            text-align: center;
+            padding: 15px;
+            background: #004b8d;
+            color: #fff;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <h1>Monthly Activity Report</h1>
+            <p>{{ report_data.report_period }}</p>
+        </div>
+
+        <!-- Body -->
+        <div class="email-body">
+            <!-- Sponsor Information -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">Sponsor Details</div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ report_data.name }}</p>
+                    <p><strong>Company Name:</strong> {{ report_data.sponsor_name }}</p>
+                    <p><strong>Industry:</strong> {{ report_data.industry }}</p>
+                </div>
+            </div>
+
+            <!-- Campaign Details -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-info text-white">Campaign Details</div>
+                <div class="card-body">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-info">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Budget</th>
+                                <th>Goals</th>
+                                <th>Visibility</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for campaign in report_data.campaigns %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ campaign.name }}</td>
+                                <td>{{ campaign.start_date.strftime('%d-%m-%Y') }}</td>
+                                <td>{{ campaign.end_date.strftime('%d-%m-%Y') }}</td>
+                                <td>${{ campaign.budget }}</td>
+                                <td>{{ campaign.goals }}</td>
+                                <td>{{ campaign.visibility }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Campaign Summary -->
+            <div class="card">
+                <div class="card-header bg-success text-white">Campaign Summary</div>
+                <div class="card-body">
+                    <p><strong>Total Campaigns:</strong> {{ report_data.campaigns|length }}</p>
+                    <p><strong>Total Advertisements:</strong> {{ report_data.total_ads }}</p>
+                    <p><strong>Total Budget Used:</strong> ${{ report_data.total_budget_used }}</p>
+                    <p><strong>Remaining Budget:</strong> ${{ report_data.remaining_budget }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="email-footer">
+            <p>© {{ report_data.year }} IESCP. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

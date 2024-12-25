@@ -10,12 +10,13 @@ import { RouterView } from 'vue-router';
             <h2 class="text-white text-center">Sponsor</h2>
             <router-link to="/Sponsor">Home</router-link>
             <router-link to="/Sponsor/UpdatePro">Update Profile</router-link>
-            <router-link to="/Sponsor/SearchInf">Search Influencer</router-link>
-            <router-link to="/Sponsor/Camp">My Campaigns</router-link>
             <router-link to="/Sponsor/CreatCamp">Create Campaign</router-link>
+            <router-link to="/Sponsor/Camp">My Campaigns</router-link>
+            <router-link to="/Sponsor/SearchInf">Search Influencer</router-link>
             <router-link to="/Sponsor/CampReq">Received Request</router-link>
             <router-link to="/Sponsor/CampReqTotal">Track Request</router-link>
-            <router-link to="/login">Logout</router-link>
+
+            <button @click="logout"  class="logout-btn">Logout</button>
         </div>
 
         <RouterView />
@@ -24,6 +25,24 @@ import { RouterView } from 'vue-router';
 
 
 </template>
+
+
+<script>
+import router from "@/router";
+
+export default {
+    methods: {
+        logout(){
+            localStorage.removeItem('token');
+            localStorage.removeItem("user");
+            router.push('/login');
+        }
+    }
+
+}
+
+
+</script>
 
 <style scoped>
 .sidebar {
@@ -44,6 +63,19 @@ import { RouterView } from 'vue-router';
     display: block;
     font-weight: 500;
     margin-bottom: 10px;
+}
+
+.sidebar button.logout-btn {
+    background-color: transparent;
+    border: none;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+}
+
+.sidebar button.logout-btn:hover {
+    background-color: #495057;
+    border-radius: 5px;
 }
 
 .sidebar a:hover {

@@ -2,7 +2,7 @@
     <div class="col-md-9 col-lg-10 content">
         <!-- Header Section -->
         <div class="header-section text-secondary p-4 rounded mb-4">
-            <h1 class="text-center mb-0">My Ad Requests</h1>
+            <h1 class="text-center mb-0"> Track Requests</h1>
             <p class="text-center">Track all ad requests sent to you by sponsors.</p>
         </div>
 
